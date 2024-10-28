@@ -4,7 +4,6 @@ const AdComponent = ({ slot }) => {
   const adRef = useRef(null);
 
   useEffect(() => {
-    // Tải mã quảng cáo chỉ một lần
     const loadAdScript = () => {
       const script = document.createElement("script");
       script.async = true;
@@ -13,22 +12,32 @@ const AdComponent = ({ slot }) => {
       document.body.appendChild(script);
     };
 
-    if (!window.adsbygoogle) {
-      loadAdScript();
-    }
-
-    if (adRef.current && !adRef.current.hasAd) {
-      try {
+    const pushAd = () => {
+      if (adRef.current && adRef.current.offsetWidth > 0) {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
-        adRef.current.hasAd = true; // Đánh dấu quảng cáo đã được tải          
-      } catch (e) {
-        console.error("AdSense error:", e);
       }
-    }
+    };
+
+    loadAdScript();
+
+    // Wait for the ad container to have a defined width before pushing the ad
+    const observer = new MutationObserver(() => {
+      if (adRef.current && adRef.current.offsetWidth > 0) {
+        pushAd();
+        observer.disconnect(); // Stop observing after the ad is pushed
+      }
+    });
+
+    observer.observe(adRef.current, { attributes: true, childList: true, subtree: true });
+
+    // Cleanup on component unmount
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   return (
-    <div className="ad-container" style={{ textAlign: "center", margin: "20px 0" }}>
+    <div className="ad-container">
       <ins
         ref={adRef}
         className="adsbygoogle"
@@ -37,7 +46,7 @@ const AdComponent = ({ slot }) => {
         data-ad-slot={slot}
         data-ad-format="auto"
         data-full-width-responsive="true"
-        data-ad-test="on" // Bật chế độ Test Ads
+        data-ad-test="on" // Enable Test Ads
       ></ins>
     </div>
   );

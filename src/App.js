@@ -5,12 +5,6 @@ import "./App.css";
 import AdComponent from "./AdComponent";
 
 function App() {
-  const adsTxtUrl = "https://test-adsense.vercel.app/ads.txt"; // Địa chỉ của ads.txt
-
-  const openAdsTxt = () => {
-    window.open(adsTxtUrl); // Mở liên kết trong tab mới
-  };
-
   return (
     <div className="App">
       <header className="App-header">
@@ -38,10 +32,7 @@ function App() {
           </p>
         </section>
 
-        {/* Nút để mở trang ads.txt */}
-        <button onClick={openAdsTxt} style={{ marginTop: '20px' }}>
-          Xem Nội Dung ads.txt
-        </button>
+  
       </main>
 
       <footer className="App-footer">
