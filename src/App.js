@@ -8,7 +8,7 @@ function App() {
   const adsTxtUrl = "https://test-adsense.vercel.app/ads.txt"; // Địa chỉ của ads.txt
 
   const openAdsTxt = () => {
-    window.open(adsTxtUrl, "_blank"); // Mở liên kết trong tab mới
+    window.open(adsTxtUrl); // Mở liên kết trong tab mới
   };
 
   return (
