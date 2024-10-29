@@ -1,44 +1,56 @@
 // src/App.js
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useParams, useNavigate } from "react-router-dom";
 
-import React from "react";
-import "./App.css";
-import AdComponent from "./AdComponent";
+function IframeComponent() {
+  const { page } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleIframeClick = (event) => {
+      const target = event.target;
+      if (target.tagName === "A" && target.dataset.path) {
+        event.preventDefault(); // Prevent the default anchor click behavior
+        const newPath = target.dataset.path.replace(".html", ""); // Get the path without .html
+        navigate(newPath); // Use react-router's navigate function
+      }
+    };
+
+    const iframe = document.getElementById("dynamic-iframe");
+
+    // Add click event listener to the iframe's content
+    iframe.onload = () => {
+      const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+      iframeDocument.addEventListener("click", handleIframeClick);
+    };
+
+    // Cleanup the event listener when the component unmounts
+    return () => {
+      if (iframe) {
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDocument.removeEventListener("click", handleIframeClick);
+      }
+    };
+  }, [navigate]);
+
+  return (
+    <iframe
+      id="dynamic-iframe"
+      src={`${process.env.PUBLIC_URL}/${page || "about-screen"}.html`}
+      title="Dynamic Page"
+      style={{ width: "100%", height: "100vh", border: "none" }}
+    />
+  );
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Welcome to My Test AdSense Page</h1>
-        <p>Check out the ad below:</p>
-        <AdComponent slot={'2135685733'} />
-      </header>
-
-      <main className="App-content">
-        <section className="content">
-          <h2>Main Content Area</h2>
-          <p>
-            This is the main content area. You can add text, images, or other components here.
-          </p>
-        </section>
-
-        {/* Quảng cáo AdSense */}
-        <h2>Quảng cáo ở đây</h2>
-        <AdComponent slot={'6171133665'} />
-
-        <section className="content">
-          <h2>Another Section</h2>
-          <p>
-            This is another section of content. More text and other information can go here.
-          </p>
-        </section>
-
-  
-      </main>
-
-      <footer className="App-footer">
-        <p>&copy; 2024 My Test AdSense Page</p>
-      </footer>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<IframeComponent />} />
+        <Route path="/:page" element={<IframeComponent />} />
+      </Routes>
+    </Router>
   );
 }
 
